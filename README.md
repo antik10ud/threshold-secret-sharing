@@ -6,8 +6,8 @@ Core implementation of Threshold Secret Sharing (TSS) [http://tools.ietf.org/htm
   It uses a finite field GF(256) instead of Shamir scheme using large integers modulo a large prime number. 
   Max number of shares is 255, max secret key bytes is 65535. 
 
-  [https://github.com/antik10ud/threshold-secret-sharing/blob/master/src/main/java/com/k10ud/cryptography/tss/core/ThresholdSecretSharing.java](KISS code)
-  [https://github.com/antik10ud/threshold-secret-sharing/blob/master/src/test/java/com/k10ud/cryptography/tss/core/ThresholdSecretSharingTest.java](Tested code)
+  [KISS code](https://github.com/antik10ud/threshold-secret-sharing/blob/master/src/main/java/com/k10ud/cryptography/tss/core/ThresholdSecretSharing.java)
+  [Tested code](https://github.com/antik10ud/threshold-secret-sharing/blob/master/src/test/java/com/k10ud/cryptography/tss/core/ThresholdSecretSharingTest.java)
 
 
 ## Requirements

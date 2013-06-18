@@ -27,7 +27,7 @@ Java 1.7 (But probably works with older versions)
 
     # Recover secret from two shares
 	
-	byte[][] shares = { Hex.convert("FFB9FA07E185"), Hex.convert("00F5409B4511") };
+	byte[][] shares = { Hex.convert("01B9FA07E185"), Hex.convert("02F5409B4511") };
 	byte[] secret = tss.recoverSecret(shares);
 		
 		

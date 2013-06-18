@@ -1,5 +1,6 @@
 package com.k10ud.cryptography.tss.core;
 
+import java.util.Arrays;
 import java.util.Random;
 
 //  http://tools.ietf.org/html/draft-mcgrew-tss-03
@@ -30,8 +31,7 @@ public class ThresholdSecretSharing {
 			192, 247, 112, 7 };
 
 	private int add(int a, int b) {
-		int r = a ^ b;
-		return r;
+		return a ^ b;
 	}
 
 	private int mul(int x, int y) {
@@ -39,8 +39,7 @@ public class ThresholdSecretSharing {
 			return 0;
 		int v = (LOG_OP[0xff & x] + LOG_OP[0xff & y]) % 0xff;
 		assert v >= 0 && v < 255;
-		int r = EXP_OP[v];
-		return r;
+		return EXP_OP[v];
 	}
 
 	private int div(int x, int y) {
@@ -52,10 +51,22 @@ public class ThresholdSecretSharing {
 		if (v < 0)
 			v = 0xff + v;
 		assert v >= 0 && v < 255;
-		int r = EXP_OP[v];
-		return r;
+		return EXP_OP[v];
 	}
 
+	/**
+	 * Generate a set of shares from the secret provided. Secret reconstruction will require 'threshold' shares in order to reconstruct correctly a secret
+	 * 
+	 * @param secret
+	 *            byte array of len 1..65536
+	 * @param shares
+	 *            number of shares to generate
+	 * @param threshold
+	 *            number of required shares in order to reconstruct a secret
+	 * @param rnd
+	 *            Source for random numbers (this must be a good random number generator, at least SecureRandom)
+	 * @return byte array of byte arrays (a list of shares as raw bytes)
+	 */
 	public byte[][] createShares(byte[] secret, int shares, int threshold, Random rnd) {
 		if (secret == null)
 			throw new IllegalArgumentException("null secret");
@@ -74,12 +85,18 @@ public class ThresholdSecretSharing {
 		for (int i = 0; i < shares; i++)
 			share[i][0] = (byte) (i + 1);
 
-		byte[] a = new byte[threshold];
-		for (int i = 0; i < m; i++) {
-			rnd.nextBytes(a);
-			a[0] = secret[i];
-			for (int j = 0; j < shares; j++)
-				share[j][i + 1] = (byte) eval(share[j][0], a);
+		byte[] a = null;
+		try {
+			a = new byte[threshold];
+			for (int i = 0; i < m; i++) {
+				rnd.nextBytes(a);
+				a[0] = secret[i];
+				for (int j = 0; j < shares; j++)
+					share[j][i + 1] = (byte) eval(share[j][0], a);
+			}
+		} finally {
+			if (a != null)
+				Arrays.fill(a, (byte) 0);
 		}
 		return share;
 	}
@@ -96,6 +113,13 @@ public class ThresholdSecretSharing {
 		return r;
 	}
 
+	/**
+	 * Reconstructs a secret from a list of raw bytes shares
+	 * 
+	 * @param shares
+	 *            byte array of byte arrays (a list of shares as raw bytes)
+	 * @return recovered byte array secret
+	 */
 	public byte[] recoverSecret(byte[][] shares) {
 		if (shares == null)
 			throw new IllegalArgumentException("null shares");
@@ -103,12 +127,13 @@ public class ThresholdSecretSharing {
 		int threshold = shares.length;
 		if (threshold == 0)
 			throw new IllegalArgumentException("not enought shares:" + threshold);
-
+		if (threshold > MAX_SHARES)
+			throw new IllegalArgumentException("too many shares:" + threshold);
 		int m = shares[0].length - 1;
 		if (m <= 0)
 			throw new IllegalArgumentException("invalid share length:" + (m + 1) + " (<=0)");
 		if (m > MAX_SECRET_BYTES)
-			throw new IllegalArgumentException("invalid share length:" + (m + 1) + " (>" + MAX_SECRET_BYTES + ")");
+			throw new IllegalArgumentException("invalid share length:" + (m + 1) + " (>" + (MAX_SECRET_BYTES + 1) + ")");
 
 		for (int i = 1; i < shares.length; i++) {
 			if (shares[i] == null)
@@ -117,24 +142,33 @@ public class ThresholdSecretSharing {
 				throw new IllegalArgumentException("shares are not equal length, inconsistent input");
 
 		}
-		byte[] u = new byte[threshold];
-		for (int i = 0; i < threshold; i++) {
-			u[i] = shares[i][0];
-			if ((0xff & u[i]) <= 0)
-				throw new IllegalArgumentException("invalid share index: " + shares[i][0] + " (<=0)");
-			for (int j = 0; j < i; j++)
-				if (u[i] == u[j])
-					throw new IllegalArgumentException("duplicated share index: " + u[i]);
+		byte[] u = null;
+		byte[] v = null;
+		try {
+			u = new byte[threshold];
+			for (int i = 0; i < threshold; i++) {
+				u[i] = shares[i][0];
+				if ((0xff & u[i]) == 0)
+					throw new IllegalArgumentException("invalid share index: " + shares[i][0]);
+				for (int j = 0; j < i; j++)
+					if (u[i] == u[j])
+						throw new IllegalArgumentException("duplicated share index: " + u[i]);
 
+			}
+			byte[] secret = new byte[m];
+			v = new byte[threshold];
+			for (int j = 0; j < m; j++) {
+				for (int i = 0; i < threshold; i++)
+					v[i] = shares[i][j + 1];
+				secret[j] = (byte) lagrange(u, v);
+			}
+			return secret;
+		} finally {
+			if (u != null)
+				Arrays.fill(u, (byte) 0);
+			if (v != null)
+				Arrays.fill(v, (byte) 0);
 		}
-		byte[] secret = new byte[m];
-		byte[] v = new byte[threshold];
-		for (int j = 0; j < m; j++) {
-			for (int i = 0; i < threshold; i++)
-				v[i] = shares[i][j + 1];
-			secret[j] = (byte) lagrange(u, v);
-		}
-		return secret;
 	}
 
 	private int poly(int i, byte[] u) {

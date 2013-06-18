@@ -8,9 +8,9 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.k10ud.cryptography.tss.core.ThresholdSecretSharing;
 import com.k10ud.cryptography.tss.util.Combination;
 import com.k10ud.cryptography.tss.util.Hex;
+import com.k10ud.cryptography.tss.util.TestThread;
 
 public class ThresholdSecretSharingTest {
 
@@ -34,7 +34,7 @@ public class ThresholdSecretSharingTest {
 			tss.recoverSecret(comb);
 			Assert.fail("IllegalArgumentException expected");
 		} catch (IllegalArgumentException z) {
-			Assert.assertEquals("Message exception mismatch", "invalid share index: 0 (<=0)", z.getMessage());
+			Assert.assertEquals("Message exception mismatch", "invalid share index: 0", z.getMessage());
 		}
 	}
 
@@ -57,6 +57,15 @@ public class ThresholdSecretSharingTest {
 	}
 
 	@Test
+	public void testNotEnoughtSharesFail() {
+		ThresholdSecretSharing tss = new ThresholdSecretSharing();
+		byte[] secret = Hex.convert("cc4a97e7");
+		byte[][] comb = { Hex.convert("01446bc13d"), Hex.convert("02c0a65764"), Hex.convert("030c6442f8") };
+		byte[] recovered = tss.recoverSecret(comb);
+		Assert.assertFalse("surprise", Arrays.equals(secret, recovered));
+	}
+
+	@Test
 	public void testSmallSecrets() {
 		test(500 * TEST_LOAD_FACTOR, 1, 256, 3, 10, 3, 5);
 	}
@@ -72,12 +81,10 @@ public class ThresholdSecretSharingTest {
 	}
 
 	//	@Test
-	//	//TODO: slow test
+	//	//TODO: slow test - performance reference
 	//	public void testLarger() {
 	//		test(1, 65535, 65535, 255, 255, 255, 255);
 	//	}
-	//test fails
-	//multi thread test
 
 	private void test(int iterations, int minSecretLen, int maxSecretLen, int minShares, int maxShares, int minThreshold, int maxThreshold) {
 		System.out.print(String.format("test%n iterations:%s%n secret len:%s-%s%n shares:%s-%s%n threshold:%s-%s%n", iterations, minSecretLen, maxSecretLen,
@@ -146,6 +153,47 @@ public class ThresholdSecretSharingTest {
 		System.out.println(String.format("share len avg: %.1f", shareAvg));
 		System.out.println(String.format("threshold len avg: %.1f", thresholdAvg));
 		System.out.println();
+	}
+
+	@Test
+	public void testThreadSafe() throws InterruptedException {
+		final int N = 100 * TEST_LOAD_FACTOR;
+		int threads = 10;
+		final ThresholdSecretSharing tss = new ThresholdSecretSharing();
+		@SuppressWarnings("unchecked")
+		TestThread<Boolean>[] cthreads = new TestThread[threads];
+
+		for (int p = 0; p < threads; p++) {
+			TestThread<Boolean> t = new TestThread<Boolean>("tss-" + p) {
+				@Override
+				public void testableRun() throws Throwable {
+					for (int i = 0; i < N; i++) {
+						int secreLen = rnd.nextInt(512) + 12;
+						byte[] secret = new byte[secreLen];
+						byte[][] shares = tss.createShares(secret, 10, 3, rnd);
+						byte[] recovered = tss.recoverSecret(shares);
+						if (!Arrays.equals(secret, recovered)) {
+							setError("cannot recover secret");
+							break;
+						}
+					}
+				}
+
+				@Override
+				public Boolean getResult() {
+					return true;
+				}
+			};
+			cthreads[p] = t;
+			t.start();
+		}
+
+		for (TestThread<Boolean> t : cthreads)
+			t.join();
+
+		for (TestThread<Boolean> t : cthreads)
+			t.assertThread();
+
 	}
 
 }

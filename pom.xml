@@ -17,6 +17,8 @@
 	</dependencies>
 
 	<build>
+		<defaultGoal>package</defaultGoal>
+	    <finalName>${project.artifactId}-${project.version}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

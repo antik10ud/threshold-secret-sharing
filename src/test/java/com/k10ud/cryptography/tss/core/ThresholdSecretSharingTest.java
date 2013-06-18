@@ -9,8 +9,8 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import com.k10ud.cryptography.tss.core.ThresholdSecretSharing;
-import com.k10ud.cryptography.tss.testing.Combination;
-import com.k10ud.cryptography.tss.testing.Hex;
+import com.k10ud.cryptography.tss.util.Combination;
+import com.k10ud.cryptography.tss.util.Hex;
 
 public class ThresholdSecretSharingTest {
 
@@ -48,12 +48,6 @@ public class ThresholdSecretSharingTest {
 	}
 
 	@Test
-	public void g256div() {
-		ThresholdSecretSharing tss = new ThresholdSecretSharing();
-		Assert.assertEquals("div fail", tss.div((byte) 4, (byte) 7), (byte) 105);
-	}
-
-	@Test
 	public void mykat2() {
 		ThresholdSecretSharing tss = new ThresholdSecretSharing();
 		byte[] secret = Hex.convert("cc4a97e7");
@@ -86,7 +80,7 @@ public class ThresholdSecretSharingTest {
 	//multi thread test
 
 	private void test(int iterations, int minSecretLen, int maxSecretLen, int minShares, int maxShares, int minThreshold, int maxThreshold) {
-		System.out.print(String.format("test\n iterations:%s\n secret len:%s-%s\n shares:%s-%s\n threshold:%s-%s\n", iterations, minSecretLen, maxSecretLen,
+		System.out.print(String.format("test%n iterations:%s%n secret len:%s-%s%n shares:%s-%s%n threshold:%s-%s%n", iterations, minSecretLen, maxSecretLen,
 				minShares, maxShares, minThreshold, maxThreshold));
 
 		ThresholdSecretSharing tss = new ThresholdSecretSharing();

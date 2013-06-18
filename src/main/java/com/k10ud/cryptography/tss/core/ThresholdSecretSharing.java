@@ -6,8 +6,8 @@ import java.util.Random;
 // TODO: timing attack solution
 public class ThresholdSecretSharing {
 	//	private static Logger LOG = Logger.getLogger(ThresholdSecretSharing.class.getName());
-	public static int MAX_SECRET_BYTES = 65536;
-	public static int MAX_SHARES = 255;
+	public final static int MAX_SECRET_BYTES = 65536;
+	public final static int MAX_SHARES = 255;
 	private static int[] EXP_OP = { 0x01, 0x03, 0x05, 0x0f, 0x11, 0x33, 0x55, 0xff, 0x1a, 0x2e, 0x72, 0x96, 0xa1, 0xf8, 0x13, 0x35, 0x5f, 0xe1, 0x38, 0x48,
 			0xd8, 0x73, 0x95, 0xa4, 0xf7, 0x02, 0x06, 0x0a, 0x1e, 0x22, 0x66, 0xaa, 0xe5, 0x34, 0x5c, 0xe4, 0x37, 0x59, 0xeb, 0x26, 0x6a, 0xbe, 0xd9, 0x70,
 			0x90, 0xab, 0xe6, 0x31, 0x53, 0xf5, 0x04, 0x0c, 0x14, 0x3c, 0x44, 0xcc, 0x4f, 0xd1, 0x68, 0xb8, 0xd3, 0x6e, 0xb2, 0xcd, 0x4c, 0xd4, 0x67, 0xa9,
@@ -29,12 +29,12 @@ public class ThresholdSecretSharing {
 			86, 242, 211, 171, 68, 17, 146, 217, 35, 32, 46, 137, 180, 124, 184, 38, 119, 153, 227, 165, 103, 74, 237, 222, 197, 49, 254, 24, 13, 99, 140, 128,
 			192, 247, 112, 7 };
 
-	int add(int a, int b) {
+	private int add(int a, int b) {
 		int r = a ^ b;
 		return r;
 	}
 
-	int mul(int x, int y) {
+	private int mul(int x, int y) {
 		if (x == 0 || y == 0)
 			return 0;
 		int v = (LOG_OP[0xff & x] + LOG_OP[0xff & y]) % 0xff;
@@ -43,7 +43,7 @@ public class ThresholdSecretSharing {
 		return r;
 	}
 
-	int div(int x, int y) {
+	private int div(int x, int y) {
 		if (x == 0)
 			return 0;
 		if (y == 0)
@@ -84,7 +84,7 @@ public class ThresholdSecretSharing {
 		return share;
 	}
 
-	int eval(byte x, byte[] a) {
+	private int eval(byte x, byte[] a) {
 		assert x != 0;
 		assert a.length > 0;
 		int r = 0;
@@ -137,7 +137,7 @@ public class ThresholdSecretSharing {
 		return secret;
 	}
 
-	int poly(int i, byte[] u) {
+	private int poly(int i, byte[] u) {
 		int r = 1;
 		for (int j = 0, m = u.length; j < m; j++)
 			if (j != i)
@@ -145,7 +145,7 @@ public class ThresholdSecretSharing {
 		return r;
 	}
 
-	int lagrange(byte[] u, byte[] v) {
+	private int lagrange(byte[] u, byte[] v) {
 		int m = u.length;
 		assert m == v.length;
 		int r = 0;

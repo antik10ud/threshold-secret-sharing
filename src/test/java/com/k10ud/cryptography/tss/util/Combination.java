@@ -1,4 +1,4 @@
-package com.k10ud.cryptography.tss.testing;
+package com.k10ud.cryptography.tss.util;
 
 import java.util.Arrays;
 import java.util.Iterator;

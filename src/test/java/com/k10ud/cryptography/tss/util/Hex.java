@@ -1,4 +1,4 @@
-package com.k10ud.cryptography.tss.testing;
+package com.k10ud.cryptography.tss.util;
 
 
 public final class Hex {

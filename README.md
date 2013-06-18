@@ -7,6 +7,7 @@ Core implementation of Threshold Secret Sharing (TSS) [http://tools.ietf.org/htm
   Max number of shares is 255, max secret key bytes is 65535. 
 
   [KISS code](https://github.com/antik10ud/threshold-secret-sharing/blob/master/src/main/java/com/k10ud/cryptography/tss/core/ThresholdSecretSharing.java)
+  
   [Tested code](https://github.com/antik10ud/threshold-secret-sharing/blob/master/src/test/java/com/k10ud/cryptography/tss/core/ThresholdSecretSharingTest.java)
 
 

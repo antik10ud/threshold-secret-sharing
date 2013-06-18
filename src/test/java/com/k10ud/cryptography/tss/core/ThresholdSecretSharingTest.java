@@ -8,8 +8,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.k10ud.cryptography.tss.util.Combination;
-import com.k10ud.cryptography.tss.util.Hex;
+import com.k10ud.cryptography.tss.robust.util.Combination;
+import com.k10ud.cryptography.tss.robust.util.Hex;
 import com.k10ud.cryptography.tss.util.TestThread;
 
 public class ThresholdSecretSharingTest {

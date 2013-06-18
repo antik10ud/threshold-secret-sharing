@@ -81,6 +81,9 @@ public class ThresholdSecretSharing {
 			throw new IllegalArgumentException("too many shares: " + shares + "(gt" + MAX_SHARES + ")");
 		if (threshold > shares)
 			throw new IllegalArgumentException("threshold > shares: " + threshold + " > " + shares);
+		if (rnd == null)
+			throw new IllegalArgumentException("null rnd");
+
 		byte[][] share = new byte[shares][m + 1];
 		for (int i = 0; i < shares; i++)
 			share[i][0] = (byte) (i + 1);

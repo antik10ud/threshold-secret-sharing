@@ -12,23 +12,25 @@ Core implementation of Threshold Secret Sharing (TSS) [http://tools.ietf.org/htm
 
 
 ## Requirements
-Java 1.7 (But probably works with older versions) 
+Java 1.7
 
 ## Compile, Test & Package
     $ mvn package
 
 ## Example
-    ThresholdSecretSharing tss = new ThresholdSecretSharing();
 
-    # Create 5 shares, secret recoverable from at least 3 different shares
+	ThresholdSecretSharing tss = new ThresholdSecretSharing();
+
+	// Create 5 shares, secret recoverable from at least 3 different shares
 
 	byte[] secret = Hex.convert("7465737400");
 	byte[][] shares = tss.createShares(secret, 5, 3, new SecureRandom());
 
-    # Recover secret from two shares
-	
-	byte[][] shares = { Hex.convert("01B9FA07E185"), Hex.convert("02F5409B4511") };
-	byte[] secret = tss.recoverSecret(shares);
+	// Recover secret from 3 shares
+
+	byte[] recoveredSecret = tss.recoverSecret(new byte[][] { shares[0], shares[2], shares[3] });
+
+	Assert.assertArrayEquals(recoveredSecret, secret);
 		
 		
 ## License

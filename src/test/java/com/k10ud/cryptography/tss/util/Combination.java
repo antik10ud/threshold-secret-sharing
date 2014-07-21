@@ -4,16 +4,18 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-//http://msdn.microsoft.com/en-us/library/aa289166.aspx
-//TODO: test + document
+// http://msdn.microsoft.com/en-us/library/aa289166.aspx
+// TODO: test + document
 public class Combination implements Iterable<int[]> {
-	private int n;
-	private int k;
-	private int[] data;
+	private final int n;
+	private final int k;
+	private final int[] data;
 
 	public Combination(int n, int k) {
-		if (n < 0 || k < 0) // normally n >= k
-			throw new IllegalArgumentException("Negative parameter in constructor");
+		if (n < 0)
+			throw new IllegalArgumentException("n<0");
+		if (k < 0)
+			throw new IllegalArgumentException("k<0");
 		if (n < k)
 			throw new IllegalArgumentException("n<k");
 		this.n = n;
@@ -33,11 +35,11 @@ public class Combination implements Iterable<int[]> {
 		for (int i = 0; i < a.length; ++i)
 			this.data[i] = a[i];
 
-		if (!this.isValid())
+		if (!isValid())
 			throw new IllegalArgumentException("Bad value from array");
 	}
 
-	public boolean isValid() {
+	private boolean isValid() {
 		if (this.data.length != this.k)
 			return false; // corrupted
 
@@ -79,10 +81,6 @@ public class Combination implements Iterable<int[]> {
 		return ans;
 	}
 
-	public int[] getData() {
-		return data;
-	}
-
 	private int choose(int n, int k) {
 		if (n < 0 || k < 0)
 			throw new IllegalArgumentException("Invalid negative parameter in choose()");
@@ -119,7 +117,7 @@ public class Combination implements Iterable<int[]> {
 		int x = (choose(this.n, this.k) - 1) - m; // x is the "dual" of m
 
 		for (int i = 0; i < this.k; ++i) {
-			ans[i] = largestV(a, b, x); // largest value v, where v < a and vCb < x    
+			ans[i] = largestV(a, b, x); // largest value v, where v < a and vCb < x
 			x = x - choose(ans[i], b);
 			a = ans[i];
 			b = b - 1;
@@ -131,7 +129,7 @@ public class Combination implements Iterable<int[]> {
 		return new Combination(this.n, this.k, ans);
 	}
 
-	// return largest value v where v < a and  Choose(v,b) <= x
+	// return largest value v where v < a and Choose(v,b) <= x
 	private int largestV(int a, int b, int x) {
 		int v = a - 1;
 

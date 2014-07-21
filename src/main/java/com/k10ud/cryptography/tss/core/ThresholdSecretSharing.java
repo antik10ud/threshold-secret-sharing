@@ -43,18 +43,6 @@ public class ThresholdSecretSharing {
 			0x41, 0xa2, 0x6d, 0x47, 0x14, 0x2a, 0x9e, 0x5d, 0x56, 0xf2, 0xd3, 0xab, 0x44, 0x11, 0x92, 0xd9, 0x23, 0x20, 0x2e, 0x89, 0xb4, 0x7c, 0xb8, 0x26,
 			0x77, 0x99, 0xe3, 0xa5, 0x67, 0x4a, 0xed, 0xde, 0xc5, 0x31, 0xfe, 0x18, 0x0d, 0x63, 0x8c, 0x80, 0xc0, 0xf7, 0x70, 0x07 };
 
-	static {
-		System.out.println(EXP_OP.length);
-		System.out.println(LOG_OP.length);
-		for (int i = 0; i < LOG_OP.length; i++) {
-			String hexString = Integer.toHexString(LOG_OP[i]);
-			if (hexString.length() == 1)
-				hexString = "0" + hexString;
-			System.out.println("0x" + hexString + ",");
-		}
-
-	}
-
 	private int add(int a, int b) {
 		return a ^ b;
 	}
@@ -143,7 +131,7 @@ public class ThresholdSecretSharing {
 	 *            byte array of byte arrays (a list of shares as raw bytes)
 	 * @return recovered byte array secret
 	 */
-	public byte[] recoverSecret(byte[][] shares) {
+	public byte[] recoverSecret(byte[]... shares) {
 		if (shares == null)
 			throw new IllegalArgumentException("null shares");
 

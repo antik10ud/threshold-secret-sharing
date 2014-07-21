@@ -28,7 +28,7 @@ Java 1.7
 
 	// Recover secret from 3 shares
 
-	byte[] recoveredSecret = tss.recoverSecret(new byte[][] { shares[0], shares[2], shares[3] });
+	byte[] recoveredSecret = tss.recoverSecret(shares[0], shares[2], shares[3]);
 
 	Assert.assertArrayEquals(recoveredSecret, secret);
 		
